@@ -398,7 +398,7 @@ if __name__ == "__main__":
             build_font_variable,
             (
                 designspace,
-                "Cascadia Code",
+                "Cascadia Code Min",
                 args.vtt_compile,
             ),
         )
@@ -409,7 +409,7 @@ if __name__ == "__main__":
                 build_font_variable,
                 (
                     designspaceItalic,
-                    "Cascadia Code Italic",
+                    "Cascadia Code Min Italic",
                     args.vtt_compile,
                 ),
             )
@@ -442,7 +442,7 @@ if __name__ == "__main__":
                 build_font_variable,
                 (
                     designspace,
-                    "Cascadia Code PL",
+                    "Cascadia Code Min PL",
                     args.vtt_compile,
                 ),
             )
@@ -453,7 +453,7 @@ if __name__ == "__main__":
                     build_font_variable,
                     (
                         designspaceItalic,
-                        "Cascadia Code PL Italic",
+                        "Cascadia Code Min PL Italic",
                         args.vtt_compile,
                     ),
                 )
@@ -490,7 +490,7 @@ if __name__ == "__main__":
                     (
                         designspace,
                         instance_descriptor,
-                        "Cascadia Code",
+                        "Cascadia Code Min",
                     ),
                 )
             )
@@ -512,7 +512,7 @@ if __name__ == "__main__":
                         (
                             designspace,
                             instance_descriptor,
-                            "Cascadia Code PL",
+                            "Cascadia Code Min PL",
                         ),
                     )
                 )
@@ -536,7 +536,7 @@ if __name__ == "__main__":
                         (
                             designspaceItalic,
                             instance_descriptor,
-                            "Cascadia Code Italic",
+                            "Cascadia Code Min Italic",
                         ),
                     )
                 )
@@ -558,7 +558,7 @@ if __name__ == "__main__":
                             (
                                 designspaceItalic,
                                 instance_descriptor,
-                                "Cascadia Code PL Italic",
+                                "Cascadia Code Min PL Italic",
                             ),
                         )
                     )

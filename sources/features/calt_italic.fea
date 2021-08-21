@@ -1,4 +1,8 @@
 feature calt {
+
+# Always use slash 0
+sub zero by zero.zero;
+
 ### Exclam (for equal see below)
 # !=
 # lookup exclam_equal {

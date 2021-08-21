@@ -1,7 +1,7 @@
 feature calt {
 
 # Always use slash 0
-sub zero by zero.zero;
+# sub zero by zero.zero;
 
 ### Exclam (for equal see below)
 # !=

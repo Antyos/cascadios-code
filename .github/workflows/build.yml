@@ -48,9 +48,10 @@ jobs:
           mkdir -p out
           cd build
           zip -r ../out/CascadiaCode.zip ttf otf woff2
+          cd ..
           
       - name: Upload font artifact
         uses: actions/upload-artifact@v2.2.4
         with:
           name: FontPackage
-          path: ../out/CascadiaCode.zip
+          path: out/CascadiaCode.zip

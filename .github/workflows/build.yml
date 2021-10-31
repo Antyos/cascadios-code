@@ -48,3 +48,50 @@ jobs:
         with:
           name: FontPackage
           path: build/
+  
+  patch:
+    # Based on: https://github.com/adam7/delugia-code/blob/master/.github/workflows/ci.yaml
+    name: Patch fonts with NerdPatcher
+    runs-on: ubuntu-latest
+    needs: build
+    env:
+      NERDFONTVERS: v2.1.0
+
+    steps:
+      - name: Setup Python 3.8
+        uses: actions/setup-python@v2.2.2
+        with:
+          python-version: 3.8
+      - name: Install FontForge
+        run: |
+          sudo add-apt-repository ppa:fontforge/fontforge -y -u;
+          sudo apt-get install fontforge -y;
+      - name: Download and patch Font Patcher
+        run: |
+          curl -L https://raw.githubusercontent.com/ryanoasis/nerd-fonts/${NERDFONTVERS}/font-patcher --output font-patcher
+          patch font-patcher 0001*.patch
+
+      - name: Download font package
+        uses: actions/download-artifact@v2.0.10
+        with:
+          name: FontPackage
+          path: build/
+      - name: Extract additional powerline glyphs
+        run: fontforge -lang=ff -script extract-extra-glyphs
+
+#       - name: Build Complete
+#         run: |
+#           ./do_generate 21 -c --mono CascadiaCodePL-Regular.ttf            DelugiaComplete.ttf              "Delugia"       "Regular"
+#           ./do_generate 22 -c --mono CascadiaCodePL-Bold.ttf               DelugiaComplete-Bold.ttf         "Delugia"       "Bold"
+#           ./do_generate 23 -c --mono CascadiaCodePL-Italic.ttf             DelugiaComplete-Italic.ttf       "Delugia"       "Italic"
+#           ./do_generate 24 -c --mono CascadiaCodePL-BoldItalic.ttf         DelugiaComplete-BoldItalic.ttf   "Delugia"       "Bold Italic"
+#           ./do_generate 25 -c --mono CascadiaCodePL-Light.ttf              DelugiaCompleteLight.ttf         "Delugia Light" ""
+#           ./do_generate 26 -c --mono CascadiaCodePL-LightItalic.ttf        DelugiaCompleteLight-Italic.ttf  "Delugia Light" "Italic"
+#           mkdir delugia-complete
+#           mv Delugia*ttf delugia-complete
+#           zip delugia-complete.zip delugia-complete/*
+#
+#       - uses: actions/upload-artifact@master
+#         with:
+#           name: Delugia Complete
+#           path: "delugia-complete"

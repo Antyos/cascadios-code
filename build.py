@@ -165,8 +165,6 @@ def prepare_fonts(
                 NERDFONTS_DIR / "NerdfontsPL-Regular.ufo", source.font
             )
             step_set_font_name(name, source.font)
-        elif "Min" in name:
-            step_set_font_name(name, source.font)
         elif "Cascadia Code" in name:
             pass
         else:
@@ -389,7 +387,7 @@ if __name__ == "__main__":
             build_font_variable,
             (
                 designspace,
-                "Cascadia Code Min",
+                "Cascadia Code",
                 args.vtt_compile,
             ),
         )
@@ -400,7 +398,7 @@ if __name__ == "__main__":
                 build_font_variable,
                 (
                     designspaceItalic,
-                    "Cascadia Code Min Italic",
+                    "Cascadia Code Italic",
                     args.vtt_compile,
                 ),
             )
@@ -433,7 +431,7 @@ if __name__ == "__main__":
                 build_font_variable,
                 (
                     designspace,
-                    "Cascadia Code Min PL",
+                    "Cascadia Code PL",
                     args.vtt_compile,
                 ),
             )
@@ -444,7 +442,7 @@ if __name__ == "__main__":
                     build_font_variable,
                     (
                         designspaceItalic,
-                        "Cascadia Code Min PL Italic",
+                        "Cascadia Code PL Italic",
                         args.vtt_compile,
                     ),
                 )
@@ -481,7 +479,7 @@ if __name__ == "__main__":
                     (
                         designspace,
                         instance_descriptor,
-                        "Cascadia Code Min",
+                        "Cascadia Code",
                     ),
                 )
             )
@@ -503,7 +501,7 @@ if __name__ == "__main__":
                         (
                             designspace,
                             instance_descriptor,
-                            "Cascadia Code Min PL",
+                            "Cascadia Code PL",
                         ),
                     )
                 )
@@ -527,7 +525,7 @@ if __name__ == "__main__":
                         (
                             designspaceItalic,
                             instance_descriptor,
-                            "Cascadia Code Min Italic",
+                            "Cascadia Code Italic",
                         ),
                     )
                 )
@@ -549,7 +547,7 @@ if __name__ == "__main__":
                             (
                                 designspaceItalic,
                                 instance_descriptor,
-                                "Cascadia Code Min PL Italic",
+                                "Cascadia Code PL Italic",
                             ),
                         )
                     )

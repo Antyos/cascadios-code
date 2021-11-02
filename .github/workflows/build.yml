@@ -39,9 +39,9 @@ jobs:
         run: ufolint sources/*.ufo
       
       # TODO: Investigate need for static fonts
-      - name: Build variable fonts
+      - name: Build fonts
         # We don't care about the mono font
-        run: python ./build.py -W -M
+        run: python ./build.py -W -M -S
           
       - name: Upload font artifact
         uses: actions/upload-artifact@v2.2.4
@@ -63,17 +63,20 @@ jobs:
         with:
           name: RawFonts
           path: build/
-      - name: Download NerdFonts Docker container
-        run: docker pull cdalvaro/nerd-fonts-patcher:latest
+          
+#       - name: Download NerdFonts Docker container
+#         run: docker pull cdalvaro/nerd-fonts-patcher:latest
+
       - name: Patch fonts
         run: |
           docker run --rm \
-            --volume $(pwd)/in:/build:ro \
-            --volume $(pwd)/out:/patched \
+            --volume $(pwd)/build:/nerd-fonts/in:ro \
+            --volume $(pwd)/patched:/nerd-fonts/out \
             --user $(id -u):$(id -g) \
             cdalvaro/nerd-fonts-patcher:2.1.0 \
             --quiet --no-progressbars \
             --mono --adjust-line-height --complete --careful
+            
       - name: Upload patched font artifact
         uses: actions/upload-artifact@v2.2.4
         with:

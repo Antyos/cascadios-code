@@ -14,16 +14,16 @@ import fontTools.designspaceLib
 import fontTools.ttLib
 import fontTools.ttLib.tables._g_l_y_f as _g_l_y_f
 import psautohint.__main__
-import statmake.classes
-import statmake.lib
+from gftools.stat import gen_stat_tables_from_config
+import yaml
 import ufo2ft
 import ufoLib2
 import vttLib
 import vttLib.transfer
 from vttmisc import tsi1, tsic
 
-VERSION_YEAR_MONTH = 2108
-VERSION_DAY = 21
+VERSION_YEAR_MONTH = 2110
+VERSION_DAY = 31
 OUTPUT_DIR = Path("build")
 OUTPUT_OTF_DIR = OUTPUT_DIR / "otf"
 OUTPUT_TTF_DIR = OUTPUT_DIR / "ttf"
@@ -237,17 +237,13 @@ def compile_variable_and_save(
     print(f"[{familyName} {styleName}] Compiling")
     varFont = ufo2ft.compileVariableTTF(designspace, inplace=True)
 
-    print(f"[{familyName} {styleName}] Adding STAT table")
-    styleSpace = statmake.classes.Stylespace.from_file(INPUT_DIR / "STAT.plist")
-    statmake.lib.apply_stylespace_to_variable_font(styleSpace, varFont, {})
-
-
     print(f"[{familyName} {styleName}] Merging VTT")
 
     if "Italic" in styleName:
         font_vtt = fontTools.ttLib.TTFont(ITALIC_VTT_DATA_FILE)
     else:
         font_vtt = fontTools.ttLib.TTFont(VTT_DATA_FILE)
+    
 
     for table in ["TSI0", "TSI1", "TSI2", "TSI3", "TSI5", "TSIC", "maxp"]:
         varFont[table] = fontTools.ttLib.newTable(table)
@@ -267,12 +263,10 @@ def compile_variable_and_save(
     # last minute manual corrections to set things correctly
     # set two flags to enable proper rendering (one for overlaps in Mac, the other for windows hinting)
     # Helping mac office generage the postscript name correctly for variable fonts when an italic is present
-
     set_overlap_flag(varFont)
     varFont["head"].flags = 0x000b
 
     if "Regular" in styleName:
-        varFont["name"].setName(familyName.replace(" Regular",""), 4, 3, 1, 1033)
         varFont["name"].setName(familyName.replace(" ","")+"Roman", 25, 3, 1, 1033)
 
     print(f"[{familyName} {styleName}] Saving")
@@ -576,6 +570,16 @@ if __name__ == "__main__":
     for process in processes:
         process.get()
     del processes, pool
+
+    # Step 1.5: Adding STAT tables in one go
+    print ("[Cascadia Variable fonts] Fixing STAT tables")
+    fontSTAT = [fontTools.ttLib.TTFont(f) for f in list(OUTPUT_TTF_DIR.glob("*.ttf"))]
+    with open(INPUT_DIR/"stat.yaml") as f:
+        config = yaml.load(f, Loader=yaml.SafeLoader)
+    gen_stat_tables_from_config(config, fontSTAT)
+
+    for font in fontSTAT:
+        font.save(font.reader.file.name)
 
     # Stage 2: Autohint and maybe compress all the static things.
     if args.static_fonts is True:

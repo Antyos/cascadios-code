@@ -46,7 +46,7 @@ jobs:
       - name: Upload font artifact
         uses: actions/upload-artifact@v2.2.4
         with:
-          name: FontPackage
+          name: RawFonts
           path: build/
   
   patch:
@@ -58,26 +58,48 @@ jobs:
       NERDFONTVERS: v2.1.0
 
     steps:
-      - name: Setup Python 3.8
-        uses: actions/setup-python@v2.2.2
-        with:
-          python-version: 3.8
-      - name: Install FontForge
-        run: |
-          sudo add-apt-repository ppa:fontforge/fontforge -y -u;
-          sudo apt-get install fontforge -y;
-      - name: Download and patch Font Patcher
-        run: |
-          curl -L https://raw.githubusercontent.com/ryanoasis/nerd-fonts/${NERDFONTVERS}/font-patcher --output font-patcher
-          patch font-patcher 0001*.patch
-
       - name: Download font package
         uses: actions/download-artifact@v2.0.10
         with:
-          name: FontPackage
+          name: RawFonts
           path: build/
-      - name: Extract additional powerline glyphs
-        run: fontforge -lang=ff -script extract-extra-glyphs
+      - name: Download NerdFonts Docker container
+        run: docker pull cdalvaro/nerd-fonts-patcher:latest
+      - name: Patch fonts
+        run: |
+          docker run --rm \
+            --volume $(pwd)/in:/build:ro \
+            --volume $(pwd)/out:/patched \
+            --user $(id -u):$(id -g) \
+            cdalvaro/nerd-fonts-patcher:2.1.0 \
+            --quiet --no-progressbars \
+            --mono --adjust-line-height --complete --careful
+      - name: Upload patched font artifact
+        uses: actions/upload-artifact@v2.2.4
+        with:
+          name: PatchedFonts
+          path: patched/
+
+#       - name: Setup Python 3.8
+#         uses: actions/setup-python@v2.2.2
+#         with:
+#           python-version: 3.8
+#       - name: Install FontForge
+#         run: |
+#           sudo add-apt-repository ppa:fontforge/fontforge -y -u;
+#           sudo apt-get install fontforge -y;
+#       - name: Download and patch Font Patcher
+#         run: |
+#           curl -L https://raw.githubusercontent.com/ryanoasis/nerd-fonts/${NERDFONTVERS}/font-patcher --output font-patcher
+#           patch font-patcher 0001*.patch
+
+#       - name: Download font package
+#         uses: actions/download-artifact@v2.0.10
+#         with:
+#           name: FontPackage
+#           path: build/
+#       - name: Extract additional powerline glyphs
+#         run: fontforge -lang=ff -script extract-extra-glyphs
 
 #       - name: Build Complete
 #         run: |

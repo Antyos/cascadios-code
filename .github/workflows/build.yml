@@ -38,9 +38,11 @@ jobs:
       - name: Lint sources
         run: ufolint sources/*.ufo
       
-      # TODO: Investigate need for static fonts
+      # Build fonts with:
+      #   - Web fonts
+      #   - No mono fonts (the whole point of this is having custom ligatures)
+      #   - Static fonts (Needed for NerdFont patcher)
       - name: Build fonts
-        # We don't care about the mono font
         run: python ./build.py -W -M -S
           
       - name: Upload font artifact
@@ -70,7 +72,7 @@ jobs:
       - name: Patch fonts
         run: |
           docker run --rm \
-            --volume $(pwd)/build:/nerd-fonts/in:ro \
+            --volume $(pwd)/build/ttf/static:/nerd-fonts/in:ro \
             --volume $(pwd)/patched:/nerd-fonts/out \
             --user $(id -u):$(id -g) \
             cdalvaro/nerd-fonts-patcher:2.1.0 \

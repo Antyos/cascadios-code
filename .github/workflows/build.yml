@@ -65,54 +65,38 @@ jobs:
       NERDFONTVERS: v2.1.0
 
     steps:
+      - name: Setup Python 3.8
+        uses: actions/setup-python@v2.2.2
+        with:
+          python-version: 3.8
+      - name: Install FontForge
+        run: |
+          sudo add-apt-repository ppa:fontforge/fontforge -y -u;
+          sudo apt-get install fontforge -y;
+      - name: Download and patch Font Patcher
+        run: |
+          curl -L https://raw.githubusercontent.com/ryanoasis/nerd-fonts/${NERDFONTVERS}/font-patcher --output font-patcher
+          curl -L https://raw.githubusercontent.com/adam7/delugia-code/d959866015842ed0016415c0282703390e528d0c/0001-font-patcher-Use-correct-source-font-metrics.patch --output 0001.patch
+          patch font-patcher 0001.patch
+
       - name: Download font package
         uses: actions/download-artifact@v2.0.10
         with:
           name: RawFonts
           path: build/
           
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.debug_enabled }}
-#       - name: Download NerdFonts Docker container
-#         run: docker pull cdalvaro/nerd-fonts-patcher:latest
-
-      - name: Patch fonts
+      - name: Download Source Fonts
         run: |
-          docker run --rm \
-            --volume $(pwd)/build/ttf/static:/nerd-fonts/in:ro \
-            --volume $(pwd)/patched:/nerd-fonts/out \
-            --user $(id -u):$(id -g) \
-            cdalvaro/nerd-fonts-patcher:2.1.0 \
-            --quiet --no-progressbars \
-            --mono --adjust-line-height --complete --careful
-            
-      - name: Upload patched font artifact
-        uses: actions/upload-artifact@v2.2.4
-        with:
-          name: PatchedFonts
-          path: patched/
+          bash <(curl -L https://raw.githubusercontent.com/adam7/delugia-code/d959866015842ed0016415c0282703390e528d0c/download-source-fonts.sh)
+          
+      - name: Extract additional powerline glyphs
+        run: |
+          curl -L https://raw.githubusercontent.com/adam7/delugia-code/master/extract-extra-glyphs --output extract-extra-glyphs
+          fontforge -lang=ff -script extract-extra-glyphs
 
-#       - name: Setup Python 3.8
-#         uses: actions/setup-python@v2.2.2
-#         with:
-#           python-version: 3.8
-#       - name: Install FontForge
-#         run: |
-#           sudo add-apt-repository ppa:fontforge/fontforge -y -u;
-#           sudo apt-get install fontforge -y;
-#       - name: Download and patch Font Patcher
-#         run: |
-#           curl -L https://raw.githubusercontent.com/ryanoasis/nerd-fonts/${NERDFONTVERS}/font-patcher --output font-patcher
-#           patch font-patcher 0001*.patch
-
-#       - name: Download font package
-#         uses: actions/download-artifact@v2.0.10
-#         with:
-#           name: FontPackage
-#           path: build/
-#       - name: Extract additional powerline glyphs
-#         run: fontforge -lang=ff -script extract-extra-glyphs
+      - name: Patch
+        run: |
+          fontforge -script font-patcher --careful -c --custom SomeExtraSymbols.otf --no-progressbars "ttf/static/CascadiaCodePL-Regular.ttf" --mono | tee "process1.log"
 
 #       - name: Build Complete
 #         run: |
@@ -130,3 +114,14 @@ jobs:
 #         with:
 #           name: Delugia Complete
 #           path: "delugia-complete"
+
+      - name: Upload patched font artifact
+        uses: actions/upload-artifact@v2.2.4
+        with:
+          name: PatchedFonts
+          path: patched/
+
+      - name: Setup tmate session
+        if: ${{ failure() }}
+        uses: mxschmitt/action-tmate@v3
+        # if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.debug_enabled }}

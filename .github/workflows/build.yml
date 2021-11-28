@@ -70,14 +70,13 @@ jobs:
         with:
           python-version: 3.8
           
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.debug_enabled }}
+#       - name: Setup tmate session
+#         uses: mxschmitt/action-tmate@v3
+#         if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.debug_enabled }}
         
       - name: Install FontForge
-        run: |
-          sudo add-apt-repository ppa:fontforge/fontforge -y -u;
-          sudo apt-get install fontforge -y;
+        run: sudo apt-get install fontforge -y
+
       - name: Download and patch Font Patcher
         run: |
           curl -L https://raw.githubusercontent.com/ryanoasis/nerd-fonts/${NERDFONTVERS}/font-patcher --output font-patcher
@@ -119,6 +118,9 @@ jobs:
 #         with:
 #           name: Delugia Complete
 #           path: "delugia-complete"
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+#         if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.debug_enabled }}
 
       - name: Upload patched font artifact
         uses: actions/upload-artifact@v2.2.4

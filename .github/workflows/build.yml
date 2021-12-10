@@ -65,6 +65,12 @@ jobs:
       NERDFONTVERS: v2.1.0
 
     steps:
+      - name: Checkout Delugia Code
+        uses: actions/checkout@v2
+        with:
+          repository: adam7/delugia-code
+          ref: 287b1d931b74e3841eec3bb12fce53add88f84c9
+          
       - name: Setup Python 3.8
         uses: actions/setup-python@v2.2.2
         with:
@@ -80,8 +86,7 @@ jobs:
       - name: Download and patch Font Patcher
         run: |
           curl -L https://raw.githubusercontent.com/ryanoasis/nerd-fonts/${NERDFONTVERS}/font-patcher --output font-patcher
-          curl -L https://raw.githubusercontent.com/adam7/delugia-code/d959866015842ed0016415c0282703390e528d0c/0001-font-patcher-Use-correct-source-font-metrics.patch --output 0001.patch
-          patch font-patcher 0001.patch
+          patch font-patcher delugia-code/0001*.patch
 
       - name: Download font package
         uses: actions/download-artifact@v2.0.10
@@ -90,45 +95,36 @@ jobs:
           path: build/
           
       - name: Download Source Fonts
-        run: |
-          bash <(curl -L https://raw.githubusercontent.com/adam7/delugia-code/d959866015842ed0016415c0282703390e528d0c/download-source-fonts.sh)
+        run: delugia-code/download-source-fonts.sh
           
       - name: Extract additional powerline glyphs
-        run: |
-          curl -L https://raw.githubusercontent.com/adam7/delugia-code/master/extract-extra-glyphs --output extract-extra-glyphs
-          fontforge -lang=ff -script extract-extra-glyphs
+        run: fontforge -lang=ff -script delugia-code/extract-extra-glyphs
 
       - name: Patch
         run: |
-          fontforge -script font-patcher --careful -c --custom SomeExtraSymbols.otf --no-progressbars "ttf/static/CascadiaCodePL-Regular.ttf" --mono | tee "process1.log"
-
-#       - name: Build Complete
-#         run: |
-#           ./do_generate 21 -c --mono CascadiaCodePL-Regular.ttf            DelugiaComplete.ttf              "Delugia"       "Regular"
-#           ./do_generate 22 -c --mono CascadiaCodePL-Bold.ttf               DelugiaComplete-Bold.ttf         "Delugia"       "Bold"
-#           ./do_generate 23 -c --mono CascadiaCodePL-Italic.ttf             DelugiaComplete-Italic.ttf       "Delugia"       "Italic"
-#           ./do_generate 24 -c --mono CascadiaCodePL-BoldItalic.ttf         DelugiaComplete-BoldItalic.ttf   "Delugia"       "Bold Italic"
-#           ./do_generate 25 -c --mono CascadiaCodePL-Light.ttf              DelugiaCompleteLight.ttf         "Delugia Light" ""
-#           ./do_generate 26 -c --mono CascadiaCodePL-LightItalic.ttf        DelugiaCompleteLight-Italic.ttf  "Delugia Light" "Italic"
-#           mkdir delugia-complete
-#           mv Delugia*ttf delugia-complete
-#           zip delugia-complete.zip delugia-complete/*
-#
+          delugia-code/do_generate 01 -c --mono CascadiaCodePL-Regular.ttf            Cascadios.ttf              "Cascadios"
+          delugia-code/do_generate 02 -c --mono CascadiaCodePL-Bold.ttf               Cascadios-Bold.ttf         "Cascadios"
+          delugia-code/do_generate 03 -c --mono CascadiaCodePL-Italic.ttf             Cascadios-Italic.ttf       "Cascadios"
+          delugia-code/do_generate 04 -c --mono CascadiaCodePL-BoldItalic.ttf         Cascadios-BoldItalic.ttf   "Cascadios"
+          delugia-code/do_generate 05 -c --mono CascadiaCodePL-Light.ttf              Cascadios-Light.ttf        "Cascadios"
+          delugia-code/do_generate 06 -c --mono CascadiaCodePL-LightItalic.ttf        Cascadios-LightItalic.ttf  "Cascadios"
+          mkdir cascadios
+          mv Cascadios*ttf cascadios
+      - name: Upload patched font artifact
+        uses: actions/upload-artifact@v2.2.4
+        with:
+          name: Cascadios
+          path: cascadios/
+          
 #       - uses: actions/upload-artifact@master
 #         with:
 #           name: Delugia Complete
 #           path: "delugia-complete"
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
+##       - name: Setup tmate session
+##         uses: mxschmitt/action-tmate@v3
 #         if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.debug_enabled }}
 
-      - name: Upload patched font artifact
-        uses: actions/upload-artifact@v2.2.4
-        with:
-          name: PatchedFonts
-          path: patched/
-
-      - name: Setup tmate session
-        if: ${{ failure() }}
-        uses: mxschmitt/action-tmate@v3
-        # if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.debug_enabled }}
+#       - name: Setup tmate session
+#         if: ${{ failure() }}
+#         uses: mxschmitt/action-tmate@v3
+#         # if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.debug_enabled }}

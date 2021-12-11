@@ -77,10 +77,6 @@ jobs:
         uses: actions/setup-python@v2.2.2
         with:
           python-version: 3.8
-          
-#       - name: Setup tmate session
-#         uses: mxschmitt/action-tmate@v3
-#         if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.debug_enabled }}
         
       - name: Install FontForge
         run: sudo apt-get install fontforge -y
@@ -111,6 +107,10 @@ jobs:
           
       - name: Extract additional powerline glyphs
         run: fontforge -lang=ff -script extract-extra-glyphs
+
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.debug_enabled }}
 
       - name: Patch font
         run: |

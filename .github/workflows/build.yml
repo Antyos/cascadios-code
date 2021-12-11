@@ -61,7 +61,7 @@ jobs:
   patch:
     # Based on: https://github.com/adam7/delugia-code/blob/master/.github/workflows/ci.yaml
     name: Patch fonts with NerdPatcher
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     needs: build
     env:
       NERDFONTVERS: v2.1.0
@@ -73,41 +73,41 @@ jobs:
           repository: adam7/delugia-code
           ref: 287b1d931b74e3841eec3bb12fce53add88f84c9
           
-      - name: Setup Python 3.8
-        uses: actions/setup-python@v2.2.2
+#       - name: Setup Python 3.8
+#         uses: actions/setup-python@v2.2.2
+#         with:
+#           python-version: 3.8
+        
+      - name: Download font package
+        uses: actions/download-artifact@v2.0.10
         with:
-          python-version: 3.8
+          name: RawFonts
+#           path: build/
         
       - name: Install FontForge
-        run: sudo apt-get install fontforge -y
+        run: |
+          sudo add-apt-repository ppa:fontforge/fontforge -y -u;
+          sudo apt-get install fontforge -y;
 
       - name: Download and patch Font Patcher
         run: |
           curl -L https://raw.githubusercontent.com/ryanoasis/nerd-fonts/${NERDFONTVERS}/font-patcher --output font-patcher
           patch font-patcher 0001*.patch
-
-      - name: Download font package
-        uses: actions/download-artifact@v2.0.10
-        with:
-          name: RawFonts
-          path: build/
           
       - name: Download source fonts
         run: |
           chmod +x download-source-fonts.sh
           ./download-source-fonts.sh
           
-#       - name: Install PIP
-#         run: sudo apt-get install python-pip -y
-#       - name: Install configparser
-#         run: pip install configparser
-      - name: Link python libs
-        # See: https://stackoverflow.com/a/57528401
-        run: sudo ln -s /usr/local/lib64/python3.8/lib-dynload/ /usr/local/lib/python3.8/lib-dynload
-          
+      - name: Install PIP
+        run: sudo apt-get install python-pip -y
+      - name: Install configparser
+        run: pip install configparser
+#       - name: Link python libs
+#         # See: https://stackoverflow.com/a/57528401
+#         run: sudo ln -s /usr/local/lib64/python3.8/lib-dynload/ /usr/local/lib/python3.8/lib-dynload
       - name: Extract additional powerline glyphs
         run: fontforge -lang=ff -script extract-extra-glyphs
-
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
         if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.debug_enabled }}

@@ -100,10 +100,10 @@ jobs:
           chmod +x download-source-fonts.sh
           ./download-source-fonts.sh
           
-#       - name: Install PIP
-#         run: sudo apt install python-pip -y
-#       - name: Install configparser
-#         run: pip install configparser
+      - name: Install PIP
+        run: sudo apt install python-pip -y
+      - name: Install configparser
+        run: pip install configparser
           
       - name: Extract additional powerline glyphs
         run: fontforge -lang=ff -script extract-extra-glyphs

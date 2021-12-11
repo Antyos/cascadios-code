@@ -37,6 +37,7 @@ jobs:
       
       - name: Install dependencies
         run: |
+          sudo apt-get update -y
           sudo apt-get install -y ttfautohint
           pip install -r requirements.txt ufolint
           

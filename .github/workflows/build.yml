@@ -78,9 +78,9 @@ jobs:
         with:
           python-version: 3.8
           
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.debug_enabled }}
+#       - name: Setup tmate session
+#         uses: mxschmitt/action-tmate@v3
+#         if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.debug_enabled }}
         
       - name: Install FontForge
         run: sudo apt-get install fontforge -y
@@ -101,10 +101,10 @@ jobs:
           chmod +x download-source-fonts.sh
           ./download-source-fonts.sh
           
-      - name: Install PIP
-        run: sudo apt-get install python-pip -y
-      - name: Install configparser
-        run: pip install configparser
+#       - name: Install PIP
+#         run: sudo apt-get install python-pip -y
+#       - name: Install configparser
+#         run: pip install configparser
       - name: Link python libs
         # See: https://stackoverflow.com/a/57528401
         run: sudo ln -s /usr/local/lib64/python3.8/lib-dynload/ /usr/local/lib/python3.8/lib-dynload

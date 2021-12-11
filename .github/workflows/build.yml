@@ -102,9 +102,12 @@ jobs:
           ./download-source-fonts.sh
           
       - name: Install PIP
-        run: sudo apt install python-pip -y
+        run: sudo apt-get install python-pip -y
       - name: Install configparser
         run: pip install configparser
+      - name: Link python libs
+        # See: https://stackoverflow.com/a/57528401
+        run: sudo ln -s /usr/local/lib64/python3.8/lib-dynload/ /usr/local/lib/python3.8/lib-dynload
           
       - name: Extract additional powerline glyphs
         run: fontforge -lang=ff -script extract-extra-glyphs

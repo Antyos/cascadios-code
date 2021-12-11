@@ -95,13 +95,20 @@ jobs:
           name: RawFonts
           path: build/
           
-      - name: Download Source Fonts
-        run: ./download-source-fonts.sh
+      - name: Download source fonts
+        run: |
+          chmod +x download-source-fonts.sh
+          ./download-source-fonts.sh
+          
+#       - name: Install PIP
+#         run: sudo apt install python-pip -y
+#       - name: Install configparser
+#         run: pip install configparser
           
       - name: Extract additional powerline glyphs
         run: fontforge -lang=ff -script extract-extra-glyphs
 
-      - name: Patch
+      - name: Patch font
         run: |
           ./do_generate 01 -c --mono CascadiaCodePL-Regular.ttf            Cascadios.ttf              "Cascadios"
           ./do_generate 02 -c --mono CascadiaCodePL-Bold.ttf               Cascadios-Bold.ttf         "Cascadios"

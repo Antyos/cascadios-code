@@ -114,13 +114,14 @@ jobs:
 
       - name: Patch font
         run: |
+          ./do_generate 01 -c --mono CascadiaCodePL-Regular.ttf            _Cascadios.ttf              "Cascadios"
+          ./do_generate 02 -c --mono CascadiaCodePL-Bold.ttf               _Cascadios-Bold.ttf         "Cascadios"
+          ./do_generate 03 -c --mono CascadiaCodePL-Italic.ttf             _Cascadios-Italic.ttf       "Cascadios"
+          ./do_generate 04 -c --mono CascadiaCodePL-BoldItalic.ttf         _Cascadios-BoldItalic.ttf   "Cascadios"
+          ./do_generate 05 -c --mono CascadiaCodePL-Light.ttf              _Cascadios-Light.ttf        "Cascadios"
+          ./do_generate 06 -c --mono CascadiaCodePL-LightItalic.ttf        _Cascadios-LightItalic.ttf  "Cascadios"
           mkdir cascadios
-          ./do_generate 01 -c --mono CascadiaCodePL-Regular.ttf            Cascadios.ttf              "Cascadios"; mv Cascadios*ttf cascadios;
-          ./do_generate 02 -c --mono CascadiaCodePL-Bold.ttf               Cascadios-Bold.ttf         "Cascadios"; mv Cascadios*ttf cascadios;
-          ./do_generate 03 -c --mono CascadiaCodePL-Italic.ttf             Cascadios-Italic.ttf       "Cascadios"; mv Cascadios*ttf cascadios;
-          ./do_generate 04 -c --mono CascadiaCodePL-BoldItalic.ttf         Cascadios-BoldItalic.ttf   "Cascadios"; mv Cascadios*ttf cascadios;
-          ./do_generate 05 -c --mono CascadiaCodePL-Light.ttf              Cascadios-Light.ttf        "Cascadios"; mv Cascadios*ttf cascadios;
-          ./do_generate 06 -c --mono CascadiaCodePL-LightItalic.ttf        Cascadios-LightItalic.ttf  "Cascadios"; mv Cascadios*ttf cascadios;
+          mv _Cascadios*.ttf cascadios
       - name: Upload patched font artifact
         uses: actions/upload-artifact@v2.2.4
         with:

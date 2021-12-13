@@ -61,6 +61,7 @@ jobs:
   patch:
     # Based on: https://github.com/adam7/delugia-code/blob/master/.github/workflows/ci.yaml
     name: Patch fonts with NerdPatcher
+    # Fontforge scripts don't work correctly on Ubuntu-20.04
     runs-on: ubuntu-18.04
     needs: build
     env:
@@ -135,3 +136,24 @@ jobs:
         with:
           name: Cascadios
           path: cascadios/
+
+  publish:
+    name: Publish release of font files
+    needs: [patch]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download patched fonts
+        uses: actions/download-artifact@v2.0.10
+        with:
+          name: Cascadios
+          path: cascadios/
+      - name: Zip font files
+        run: |
+          zip cascadios.zip cascadios/*
+
+      - name: Create release
+        uses: softprops/actions-gh-release@v1
+        with:
+          draft: true
+          files: |
+            cascadios.zip

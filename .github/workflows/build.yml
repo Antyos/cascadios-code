@@ -163,5 +163,7 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         with:
           draft: true
+          tag_name: "v20.12a"
           files: |
             cascadios.zip
+          token: ${{ secrets.GITHUB_TOKEN }}

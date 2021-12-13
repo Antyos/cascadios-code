@@ -6,7 +6,7 @@ name: Build-Font
 on:
   # Triggers the workflow on push or pull request events but only for the main branch
   push:
-    branches: [ main ]
+    branches: [ main, 'fix-build' ]
   pull_request:
     branches: [ main ]
 
@@ -24,6 +24,8 @@ jobs:
   # Build font (Same as .azure-pipelines.yml)
   build:
     name: Build Font
+    # !!! REMOVE NEXT LINE !!!
+    if: false
     runs-on: ubuntu-latest
 
     # Steps represent a sequence of tasks that will be executed as part of the job
@@ -147,14 +149,14 @@ jobs:
           mkdir cascadios
           > cascadios/foo.txt
           
-      - name: Download patched fonts
-        uses: actions/download-artifact@v2.0.10
-        with:
-          name: Cascadios
-          path: cascadios/
-#       - name: Zip font files
-#         run: |
-#           zip cascadios.zip cascadios/*
+#       - name: Download patched fonts
+#         uses: actions/download-artifact@v2.0.10
+#         with:
+#           name: Cascadios
+#           path: cascadios/
+      - name: Zip font files
+        run: |
+          zip cascadios.zip cascadios/*
 
       - name: Create release
         uses: softprops/action-gh-release@v0.1.14

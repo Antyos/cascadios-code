@@ -149,6 +149,10 @@ jobs:
           mkdir cascadios
           > cascadios/foo.txt
           
+      - name: Get tag name from date
+        id: tag_name
+        run: echo "::set-output name=date::$(date +'%y%m.%d')"
+
 #       - name: Download patched fonts
 #         uses: actions/download-artifact@v2.0.10
 #         with:
@@ -157,12 +161,8 @@ jobs:
       - name: Zip font files
         run: |
           cd cascadios
-          zip ../cascadios.zip *
+          zip ../cascadios-${{ steps.tag_name.outputs.date }}.zip *
           cd ..
-          
-      - name: Get tag name from date
-        id: tag_name
-        run: echo "::set-output name=date::$(date +'%y%m.%d')"
 
       - name: Create tag
         uses: mathieudutour/github-tag-action@v6.0

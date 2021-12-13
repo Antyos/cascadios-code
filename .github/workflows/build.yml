@@ -119,9 +119,11 @@ jobs:
           ./do_generate 06 -c --mono CascadiaCodePL-LightItalic.ttf        _Cascadios-LightItalic.ttf  "Cascadios"
           mkdir cascadios
           mv _Cascadios*.ttf cascadios
-          
+      
+      - name: Install 'Rename'
+        run: sudo apt-get install rename -y
       - name: Remove leading `_` from file names
-        run: rename _Cascadios Cascadios cascadios/*.ttf
+        run: rename 's/_C/C/' cascadios/*.ttf
 
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3

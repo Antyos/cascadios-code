@@ -155,6 +155,8 @@ jobs:
         with:
           date_format: "%y%m.%d"
           release: false
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
           
       - name: Get tag name from date
         id: tag_name

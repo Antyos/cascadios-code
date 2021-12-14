@@ -150,10 +150,10 @@ jobs:
           > cascadios/foo.txt
           
       - name: Get CalVer
-        uses: StephaneBour/actions-calver@master
+        uses: StephaneBour/actions-calver@v1.4
         id: calver
         with:
-          date_format: "%y%m.%d"
+          date_format: "%y%m.%d.0"
           release: false
         env:
           GITHUB_TOKEN: ${{ github.token }}

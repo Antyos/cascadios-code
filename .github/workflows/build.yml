@@ -149,6 +149,13 @@ jobs:
           mkdir cascadios
           > cascadios/foo.txt
           
+      - name: Get CalVer
+        uses: StephaneBour/actions-calver@master
+        id: calver
+        with:
+          date_format: "%y%m.%d"
+          release: false
+          
       - name: Get tag name from date
         id: tag_name
         run: echo "::set-output name=date::$(date +'%y%m.%d')"
@@ -169,7 +176,7 @@ jobs:
         id: tag_version
         with:
           github_token: ${{ github.token }}
-          custom_tag: ${{ steps.tag_name.outputs.date }}
+          custom_tag: ${{ steps.calver.outputs.release }}
 
       - name: Create release
         uses: softprops/action-gh-release@v0.1.14

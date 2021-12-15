@@ -114,7 +114,9 @@ jobs:
           # path: build/
           
       - name: Set version
-        run: OURVERSION=v${{ needs.get_version.outputs.version }}
+        run: |
+          OURVERSION="v${{ needs.get_version.outputs.version }}"
+          echo "OURVERSION=$OURVERSION"
         
       - name: Install FontForge
         run: |

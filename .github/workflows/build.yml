@@ -167,7 +167,7 @@ jobs:
         id: calver
         run: |
           # Get the latest tagged version
-          LAST_VERSION=${{ steps.get_latest_tag.output.latest_tag }}
+          LAST_VERSION=${{ steps.get_latest_tag.outputs.latest_tag }}
           # Remove the 'v' from the beginning of the tag (because it breaks the pattern)
           LAST_VERSION_NO_V=${LAST_VERSION#'v'}
           # Get the next CalVer version 

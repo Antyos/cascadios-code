@@ -152,6 +152,8 @@ jobs:
       - name: Get CalVer version
         id: calver
         run: |
+          # Fetch git tags
+          git fetch --depth=1 origin +refs/tags/*:refs/tags/*
           # Get the latest tagged version
           LAST_VERSION=git describe --tags $(git rev-list --tags --max-count=1)
           # Remove the 'v' from the beginning of the tag (because it breaks the pattern)

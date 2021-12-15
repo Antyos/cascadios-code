@@ -148,14 +148,26 @@ jobs:
         run: |
           mkdir cascadios
           > cascadios/foo.txt
+      
+      - name: Get Tags
+        uses: octokit/request-action@v2.x
+        id: get_latest_release
+        with:
+          route: GET /repos/{owner}/{repo}/releases/latest
+          owner: Antyos
+          repo: cascadia-code
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Get latest tag
+        id: get_latest_tag
+        run: |
+          echo "::set-output name=latest_tag::${{ fromJson(steps.get_latest_release.outputs.data).tag_name }}"
           
       - name: Get CalVer version
         id: calver
         run: |
-          # Fetch git tags
-          git fetch --depth=1 origin +refs/tags/*:refs/tags/*
           # Get the latest tagged version
-          LAST_VERSION=git describe --tags $(git rev-list --tags --max-count=1)
+          LAST_VERSION=${{ steps.get_latest_tag.output.latest_tag }}
           # Remove the 'v' from the beginning of the tag (because it breaks the pattern)
           LAST_VERSION_NO_V=${LAST_VERSION#'v'}
           # Get the next CalVer version 

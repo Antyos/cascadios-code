@@ -12,12 +12,6 @@ on:
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
-    inputs:
-      debug_enabled:
-        description: 'Run the build with tmate debugging enabled (https://github.com/marketplace/actions/debugging-with-tmate)'     
-        type: boolean
-        required: false
-        default: "0"
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -57,8 +51,6 @@ jobs:
   # Build font (Same as .azure-pipelines.yml)
   build:
     name: Build Font
-    # !!! REMOVE NEXT LINE !!!
-    if: false
     runs-on: ubuntu-latest
 
     # Steps represent a sequence of tasks that will be executed as part of the job
@@ -99,7 +91,7 @@ jobs:
     name: Patch fonts with NerdPatcher
     # Fontforge scripts don't work correctly on Ubuntu-20.04
     runs-on: ubuntu-18.04
-    needs: build
+    needs: [ get_version, build ]
     env:
       NERDFONTVERS: v2.1.0
 
@@ -120,6 +112,9 @@ jobs:
         with:
           name: RawFonts
           # path: build/
+          
+      - name: Set version
+        run: OURVERSION=v${{ needs.get_version.outputs.version }}
         
       - name: Install FontForge
         run: |
@@ -176,19 +171,14 @@ jobs:
 
   publish:
     name: Publish release of font files
-    needs: [ get_version ]
+    needs: [ get_version, patch ]
     runs-on: ubuntu-latest
     steps:
-      - name: Create foo file
-        run: |
-          mkdir cascadios
-          > cascadios/foo.txt
-
-#       - name: Download patched fonts
-#         uses: actions/download-artifact@v2.0.10
-#         with:
-#           name: Cascadios
-#           path: cascadios/
+      - name: Download patched fonts
+        uses: actions/download-artifact@v2.0.10
+        with:
+          name: Cascadios
+          path: cascadios/
       - name: Zip font files
         run: |
           cd cascadios
@@ -206,7 +196,6 @@ jobs:
         uses: softprops/action-gh-release@v0.1.14
         # if: startsWith(github.ref, 'refs/tags/')
         with:
-          draft: true
           tag_name: ${{ steps.tag_version.outputs.new_tag }}
           files: |
             cascadios.zip

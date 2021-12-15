@@ -112,12 +112,7 @@ jobs:
         with:
           name: RawFonts
           # path: build/
-          
-      - name: Set version
-        run: |
-          OURVERSION="v${{ needs.get_version.outputs.version }}"
-          echo "OURVERSION=$OURVERSION"
-        
+
       - name: Install FontForge
         run: |
           sudo add-apt-repository ppa:fontforge/fontforge -y -u;
@@ -148,6 +143,7 @@ jobs:
         # of deleting our patched and renamed files. To get around this, we add a
         # leading `_` to the font file names and remove it later.
         run: |
+          OURVERSION="v${{ needs.get_version.outputs.version }}"
           echo "OURVERSION=$OURVERSION"
           ./do_generate 01 -c --mono CascadiaCodePL-Regular.ttf            _Cascadios.ttf              "Cascadios"
           ./do_generate 02 -c --mono CascadiaCodePL-Bold.ttf               _Cascadios-Bold.ttf         "Cascadios"

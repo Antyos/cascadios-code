@@ -144,7 +144,7 @@ jobs:
         # leading `_` to the font file names and remove it later.
         run: |
           OURVERSION="v${{ needs.get_version.outputs.version }}"
-          echo "OURVERSION=$OURVERSION"
+          echo "OURVERSION=${OURVERSION}" >> $GITHUB_ENV
           ./do_generate 01 -c --mono CascadiaCodePL-Regular.ttf            _Cascadios.ttf              "Cascadios"
           ./do_generate 02 -c --mono CascadiaCodePL-Bold.ttf               _Cascadios-Bold.ttf         "Cascadios"
           ./do_generate 03 -c --mono CascadiaCodePL-Italic.ttf             _Cascadios-Italic.ttf       "Cascadios"

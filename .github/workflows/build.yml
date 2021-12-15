@@ -21,6 +21,39 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
+  get_version:
+    name: Get the CalVer version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.calver.outputs.calver }}
+    steps:
+      - name: Get Tags
+        uses: octokit/request-action@v2.x
+        id: get_latest_release
+        with:
+          route: GET /repos/{owner}/{repo}/releases/latest
+          owner: Antyos
+          repo: cascadia-code
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Get latest tag
+        id: get_latest_tag
+        run: |
+          echo "::set-output name=latest_tag::${{ fromJson(steps.get_latest_release.outputs.data).tag_name }}"
+          
+      - name: Get CalVer version
+        id: calver
+        run: |
+          # Get the latest tagged version
+          LAST_VERSION=${{ steps.get_latest_tag.outputs.latest_tag }}
+          # Remove the 'v' from the beginning of the tag (because it breaks the pattern)
+          LAST_VERSION_NO_V=${LAST_VERSION#'v'}
+          # Get the next CalVer version 
+          NEXT_VERSION=$(docker run --rm relizaio/versioning -s YY0M.0D.Micro -v $LAST_VERSION_NO_V -a bump)
+          # Output the version
+          echo "::set-output name=calver::$NEXT_VERSION"
+
+
   # Build font (Same as .azure-pipelines.yml)
   build:
     name: Build Font
@@ -59,6 +92,7 @@ jobs:
         with:
           name: RawFonts
           path: build/
+  
   
   patch:
     # Based on: https://github.com/adam7/delugia-code/blob/master/.github/workflows/ci.yaml
@@ -139,41 +173,16 @@ jobs:
           name: Cascadios
           path: cascadios/
 
+
   publish:
     name: Publish release of font files
-#     needs: [patch]
+    needs: [ get_version ]
     runs-on: ubuntu-latest
     steps:
       - name: Create foo file
         run: |
           mkdir cascadios
           > cascadios/foo.txt
-      
-      - name: Get Tags
-        uses: octokit/request-action@v2.x
-        id: get_latest_release
-        with:
-          route: GET /repos/{owner}/{repo}/releases/latest
-          owner: Antyos
-          repo: cascadia-code
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Get latest tag
-        id: get_latest_tag
-        run: |
-          echo "::set-output name=latest_tag::${{ fromJson(steps.get_latest_release.outputs.data).tag_name }}"
-          
-      - name: Get CalVer version
-        id: calver
-        run: |
-          # Get the latest tagged version
-          LAST_VERSION=${{ steps.get_latest_tag.outputs.latest_tag }}
-          # Remove the 'v' from the beginning of the tag (because it breaks the pattern)
-          LAST_VERSION_NO_V=${LAST_VERSION#'v'}
-          # Get the next CalVer version 
-          NEXT_VERSION=$(docker run --rm relizaio/versioning -s YY0M.0D.Micro -v $LAST_VERSION_NO_V -a bump)
-          # Output the version
-          echo "::set-output name=calver::$NEXT_VERSION"
 
 #       - name: Download patched fonts
 #         uses: actions/download-artifact@v2.0.10
@@ -183,7 +192,7 @@ jobs:
       - name: Zip font files
         run: |
           cd cascadios
-          zip ../cascadios-${{ steps.calver.outputs.calver }}.zip *
+          zip ../cascadios-${{ needs.get_version.outputs.version }}.zip *
           cd ..
 
       - name: Create tag
@@ -191,7 +200,7 @@ jobs:
         id: tag_version
         with:
           github_token: ${{ github.token }}
-          custom_tag: ${{ steps.calver.outputs.calver }}
+          custom_tag: ${{ needs.get_version.outputs.version }}
 
       - name: Create release
         uses: softprops/action-gh-release@v0.1.14

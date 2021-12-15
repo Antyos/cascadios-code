@@ -149,18 +149,17 @@ jobs:
           mkdir cascadios
           > cascadios/foo.txt
           
-      - name: Get CalVer
-        uses: StephaneBour/actions-calver@v1.4
+      - name: Get CalVer version
         id: calver
-        with:
-          date_format: "%y%m.%d.0"
-          release: false
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-          
-      - name: Get tag name from date
-        id: tag_name
-        run: echo "::set-output name=date::$(date +'%y%m.%d')"
+        run: |
+          # Get the latest tagged version
+          LAST_VERSION=git describe --tags $(git rev-list --tags --max-count=1)
+          # Remove the 'v' from the beginning of the tag (because it breaks the pattern)
+          LAST_VERSION_NO_V=${LAST_VERSION#'v'}
+          # Get the next CalVer version 
+          NEXT_VERSION=$(docker run --rm relizaio/versioning -s YY0M.0D.Micro -v $LAST_VERSION_NO_V -a bump)
+          # Output the version
+          echo "::set-output name=calver::$NEXT_VERSION"
 
 #       - name: Download patched fonts
 #         uses: actions/download-artifact@v2.0.10
@@ -170,7 +169,7 @@ jobs:
       - name: Zip font files
         run: |
           cd cascadios
-          zip ../cascadios-${{ steps.tag_name.outputs.date }}.zip *
+          zip ../cascadios-${{ steps.calver.outputs.calver }}.zip *
           cd ..
 
       - name: Create tag
@@ -178,7 +177,7 @@ jobs:
         id: tag_version
         with:
           github_token: ${{ github.token }}
-          custom_tag: ${{ steps.calver.outputs.release }}
+          custom_tag: ${{ steps.calver.outputs.calver }}
 
       - name: Create release
         uses: softprops/action-gh-release@v0.1.14

@@ -133,6 +133,11 @@ jobs:
       - name: Extract additional powerline glyphs
         run: fontforge -lang=ff -script extract-extra-glyphs
 
+      - name: Set new font version
+        run: |
+          OURVERSION="v${{ needs.get_version.outputs.version }}"
+          echo "OURVERSION=${OURVERSION}" >> $GITHUB_ENV
+
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
 
@@ -143,8 +148,6 @@ jobs:
         # of deleting our patched and renamed files. To get around this, we add a
         # leading `_` to the font file names and remove it later.
         run: |
-          OURVERSION="v${{ needs.get_version.outputs.version }}"
-          echo "OURVERSION=${OURVERSION}" >> $GITHUB_ENV
           ./do_generate 01 -c --mono CascadiaCodePL-Regular.ttf            _Cascadios.ttf              "Cascadios"
           ./do_generate 02 -c --mono CascadiaCodePL-Bold.ttf               _Cascadios-Bold.ttf         "Cascadios"
           ./do_generate 03 -c --mono CascadiaCodePL-Italic.ttf             _Cascadios-Italic.ttf       "Cascadios"

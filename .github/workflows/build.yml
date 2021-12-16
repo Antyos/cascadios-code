@@ -136,9 +136,6 @@ jobs:
           OURVERSION="v${{ needs.get_version.outputs.version }}"
           echo "OURVERSION=${OURVERSION}" >> $GITHUB_ENV
 
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-
       - name: Patch font
         # NOTE: Delugia's `do_generate` script deletes the patched Cascadia Code
         # files before they were renamed with the glob pattern `C*.ttf`. While 
@@ -159,11 +156,6 @@ jobs:
         run: sudo apt-get install rename -y
       - name: Remove leading `_` from file names
         run: rename 's/_C/C/' cascadios/*.ttf
-
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        if: ${{ failure() }}
-        # if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.debug_enabled }}
 
       - name: Upload patched font artifact
         uses: actions/upload-artifact@v2.2.4

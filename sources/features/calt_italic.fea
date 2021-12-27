@@ -99,18 +99,18 @@ lookup equal_less_less {
 
 # <~
 ### Less - It is convenient to have this lookup set at the start. 
-lookup less_asciitilde {
-  sub less_asciitilde.liga   asciitilde'  by LIG;
-  ignore sub less less' asciitilde;
-  ignore sub less' asciitilde asciitilde asciitilde;
-  sub less'                  asciitilde   by less_asciitilde.liga;
-} less_asciitilde;
+# lookup less_asciitilde {
+#   sub less_asciitilde.liga   asciitilde'  by LIG;
+#   ignore sub less less' asciitilde;
+#   ignore sub less' asciitilde asciitilde asciitilde;
+#   sub less'                  asciitilde   by less_asciitilde.liga;
+# } less_asciitilde;
 
 # <~~
-lookup less_asciitilde_asciitilde {
-  sub less_asciitilde_asciitilde.liga  LIG  asciitilde'  by LIG;
-  sub less_asciitilde.liga'            LIG  asciitilde   by less_asciitilde_asciitilde.liga;
-} less_asciitilde_asciitilde;
+# lookup less_asciitilde_asciitilde {
+#   sub less_asciitilde_asciitilde.liga  LIG  asciitilde'  by LIG;
+#   sub less_asciitilde.liga'            LIG  asciitilde   by less_asciitilde_asciitilde.liga;
+# } less_asciitilde_asciitilde;
 
 #<*
 lookup less_asterisk {
@@ -1101,8 +1101,9 @@ lookup underscores {
   # middle parts
   sub [underscore_start.seq underscore_middle.seq] bar' underscore by bar_underscore_middle.seq;
 
-  sub [underscore_start.seq underscore_middle.seq bar_underscore_middle.seq] underscore' bar underscore by underscore_middle.seq;
-  sub [underscore_start.seq underscore_middle.seq bar_underscore_middle.seq] underscore' underscore by underscore_middle.seq;
+  # Underscores with bar
+  # sub [underscore_start.seq underscore_middle.seq bar_underscore_middle.seq] underscore' bar underscore by underscore_middle.seq;
+  # sub [underscore_start.seq underscore_middle.seq bar_underscore_middle.seq] underscore' underscore by underscore_middle.seq;
 
   # ends
   sub [underscore_start.seq underscore_middle.seq bar_underscore_middle.seq] underscore' by underscore_end.seq;

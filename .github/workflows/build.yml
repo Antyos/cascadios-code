@@ -19,29 +19,42 @@ jobs:
     outputs:
       version: ${{ steps.calver.outputs.calver }}
     steps:
-      - name: Get Tags
-        uses: octokit/request-action@v2.x
-        id: get_latest_release
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
-          route: GET /repos/Antyos/cascadios-code/releases/latest
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Get latest tag
-        id: get_latest_tag
-        run: |
-          echo "latest_tag=${{ fromJson(steps.get_latest_release.outputs.data).tag_name }}" >> $GITHUB_OUTPUT
+          fetch-depth: 0  # Fetch all tags
           
       - name: Get CalVer version
         id: calver
         run: |
-          # Get the latest tagged version
-          LAST_VERSION=${{ steps.get_latest_tag.outputs.latest_tag }}
-          # Remove the 'v' from the beginning of the tag (because it breaks the pattern)
-          LAST_VERSION_NO_V=${LAST_VERSION#'v'}
-          # Get the next CalVer version 
-          NEXT_VERSION=$(docker run --rm relizaio/versioning -s YY0M.0D.Micro -v $LAST_VERSION_NO_V -a bump)
-          # Output the version
-          echo "calver=$NEXT_VERSION" >> $GITHUB_OUTPUT
+          # Generate current date in CalVer format (YY0M.0D)
+          CURRENT_DATE=$(date +"%y%m.%d")
+          
+          # Get all existing tags for today's date pattern
+          EXISTING_TAGS=$(git tag -l "v${CURRENT_DATE}.*" | sort -V)
+          
+          # Determine the next micro version
+          if [ -z "$EXISTING_TAGS" ]; then
+            # No tags for today, start with .0
+            MICRO=0
+          else
+            # Get the highest micro version for today
+            LATEST_TAG=$(echo "$EXISTING_TAGS" | tail -n 1)
+            # Extract micro version (everything after the last dot)
+            CURRENT_MICRO=$(echo "$LATEST_TAG" | sed 's/.*\.//' | sed 's/^v//')
+            # Increment micro version
+            MICRO=$((CURRENT_MICRO + 1))
+          fi
+          
+          # Create the new version tag
+          NEW_VERSION="v${CURRENT_DATE}.${MICRO}"
+          
+          echo "Current date pattern: ${CURRENT_DATE}"
+          echo "Existing tags for today: ${EXISTING_TAGS:-none}"
+          echo "Next version: ${NEW_VERSION}"
+          
+          # Output the version (without 'v' prefix for consistency with downstream jobs)
+          echo "calver=${NEW_VERSION#v}" >> $GITHUB_OUTPUT
 
 
   # Build font (Same as .azure-pipelines.yml)

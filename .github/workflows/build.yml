@@ -73,100 +73,21 @@ jobs:
       # Build fonts with:
       #   - Web fonts
       #   - No mono fonts (the whole point of this is having custom ligatures)
-      #   - Static fonts (Needed for NerdFont patcher)
+      #   - Variable fonts only
       - name: Build fonts
-        run: python ./build.py -W -M -S
+        run: python ./build.py -W -M
           
       - name: Upload font artifact
         uses: actions/upload-artifact@v2.2.4
         with:
-          name: RawFonts
+          name: Cascadios
           path: build/
   
-  
-  patch:
-    # Based on: https://github.com/adam7/delugia-code/blob/master/.github/workflows/ci.yaml
-    name: Patch fonts with NerdPatcher
-    # Fontforge scripts don't work correctly on Ubuntu-20.04
-    runs-on: ubuntu-18.04
-    needs: [ get_version, build ]
-    env:
-      NERDFONTVERS: v2.1.0
-
-    steps:
-      - name: Checkout Delugia Code
-        uses: actions/checkout@v2
-        with:
-          repository: adam7/delugia-code
-          ref: 287b1d931b74e3841eec3bb12fce53add88f84c9
-          
-#       - name: Setup Python 3.8
-#         uses: actions/setup-python@v2.2.2
-#         with:
-#           python-version: 3.8
-        
-      - name: Download font package
-        uses: actions/download-artifact@v2.0.10
-        with:
-          name: RawFonts
-          # path: build/
-
-      - name: Install FontForge
-        run: |
-          sudo add-apt-repository ppa:fontforge/fontforge -y -u;
-          sudo apt-get install fontforge -y;
-
-      - name: Download and patch Font Patcher
-        run: |
-          curl -L https://raw.githubusercontent.com/ryanoasis/nerd-fonts/${NERDFONTVERS}/font-patcher --output font-patcher
-          patch font-patcher 0001*.patch
-      - name: Download source fonts
-        run: |
-          chmod +x download-source-fonts.sh
-          ./download-source-fonts.sh  
-      - name: Install PIP
-        run: sudo apt-get install python-pip -y
-      - name: Install configparser
-        run: pip install configparser
-      - name: Extract additional powerline glyphs
-        run: fontforge -lang=ff -script extract-extra-glyphs
-
-      - name: Set new font version
-        run: |
-          OURVERSION="v${{ needs.get_version.outputs.version }}"
-          echo "OURVERSION=${OURVERSION}" >> $GITHUB_ENV
-
-      - name: Patch font
-        # NOTE: Delugia's `do_generate` script deletes the patched Cascadia Code
-        # files before they were renamed with the glob pattern `C*.ttf`. While 
-        # this works for Delugia (which starts with `D`), this has the side effect
-        # of deleting our patched and renamed files. To get around this, we add a
-        # leading `_` to the font file names and remove it later.
-        run: |
-          ./do_generate 01 -c --mono CascadiaCodePL-Regular.ttf            _Cascadios.ttf              "Cascadios"
-          ./do_generate 02 -c --mono CascadiaCodePL-Bold.ttf               _Cascadios-Bold.ttf         "Cascadios"
-          ./do_generate 03 -c --mono CascadiaCodePL-Italic.ttf             _Cascadios-Italic.ttf       "Cascadios"
-          ./do_generate 04 -c --mono CascadiaCodePL-BoldItalic.ttf         _Cascadios-BoldItalic.ttf   "Cascadios"
-          ./do_generate 05 -c --mono CascadiaCodePL-Light.ttf              _Cascadios-Light.ttf        "Cascadios"
-          ./do_generate 06 -c --mono CascadiaCodePL-LightItalic.ttf        _Cascadios-LightItalic.ttf  "Cascadios"
-          mkdir cascadios
-          mv _Cascadios*.ttf cascadios
-      
-      - name: Install 'Rename'
-        run: sudo apt-get install rename -y
-      - name: Remove leading `_` from file names
-        run: rename 's/_C/C/' cascadios/*.ttf
-
-      - name: Upload patched font artifact
-        uses: actions/upload-artifact@v2.2.4
-        with:
-          name: Cascadios
-          path: cascadios/
 
 
   publish:
     name: Publish release of font files
-    needs: [ get_version, patch ]
+    needs: [ get_version, build ]
     runs-on: ubuntu-latest
     steps:
       - name: Download patched fonts

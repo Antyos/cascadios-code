@@ -23,9 +23,7 @@ jobs:
         uses: octokit/request-action@v2.x
         id: get_latest_release
         with:
-          route: GET /repos/{owner}/{repo}/releases/latest
-          owner: Antyos
-          repo: cascadia-code
+          route: GET /repos/Antyos/cascadios-code/releases/latest
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Get latest tag
@@ -56,10 +54,10 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
-      - name: Setup Python 3.8
-        uses: actions/setup-python@v2.2.2
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
         with:
-          python-version: 3.8
+          python-version: 3.11
       
       - name: Install dependencies
         run: |

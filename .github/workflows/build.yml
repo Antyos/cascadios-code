@@ -109,7 +109,7 @@ jobs:
       - name: Zip font files
         run: |
           cd cascadios
-          zip ../cascadios-${{ needs.get_version.outputs.version }}.zip *
+          zip -r ../cascadios-${{ needs.get_version.outputs.version }}.zip *
           cd ..
 
       - name: Create tag

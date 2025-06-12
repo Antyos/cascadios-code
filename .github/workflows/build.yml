@@ -29,7 +29,7 @@ jobs:
       - name: Get latest tag
         id: get_latest_tag
         run: |
-          echo "::set-output name=latest_tag::${{ fromJson(steps.get_latest_release.outputs.data).tag_name }}"
+          echo "latest_tag=${{ fromJson(steps.get_latest_release.outputs.data).tag_name }}" >> $GITHUB_OUTPUT
           
       - name: Get CalVer version
         id: calver
@@ -41,7 +41,7 @@ jobs:
           # Get the next CalVer version 
           NEXT_VERSION=$(docker run --rm relizaio/versioning -s YY0M.0D.Micro -v $LAST_VERSION_NO_V -a bump)
           # Output the version
-          echo "::set-output name=calver::$NEXT_VERSION"
+          echo "calver=$NEXT_VERSION" >> $GITHUB_OUTPUT
 
 
   # Build font (Same as .azure-pipelines.yml)
@@ -76,7 +76,7 @@ jobs:
         run: python ./build.py -W -M
           
       - name: Upload font artifact
-        uses: actions/upload-artifact@v2.2.4
+        uses: actions/upload-artifact@v4
         with:
           name: Cascadios
           path: build/
@@ -89,7 +89,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download patched fonts
-        uses: actions/download-artifact@v2.0.10
+        uses: actions/download-artifact@v4
         with:
           name: Cascadios
           path: cascadios/
@@ -100,14 +100,14 @@ jobs:
           cd ..
 
       - name: Create tag
-        uses: mathieudutour/github-tag-action@v6.0
+        uses: mathieudutour/github-tag-action@v6.2
         id: tag_version
         with:
           github_token: ${{ github.token }}
           custom_tag: ${{ needs.get_version.outputs.version }}
 
       - name: Create release
-        uses: softprops/action-gh-release@v0.1.14
+        uses: softprops/action-gh-release@v2.3.2
         # if: startsWith(github.ref, 'refs/tags/')
         with:
           tag_name: ${{ steps.tag_version.outputs.new_tag }}

@@ -97,8 +97,7 @@ jobs:
             # Remove the trademark line before the next replacement
             sed -i 's/Cascadia Code is a .*/ /g' "${f}.ttx"
             # Replace family and full name in the XML
-            sed -i 's/Cascadia Code/Cascadios Code/g' "${f}.ttx"
-            sed -i 's/CascadiaCode/CascadiosCode/g' "${f}.ttx"
+            sed -i 's/Cascadia ?Code/Cascadios/g' "${f}.ttx"
             # Rebuild font from XML
             ttx -f -o "$f" "${f}.ttx"
             rm "${f}.ttx"
@@ -108,8 +107,8 @@ jobs:
       - name: Rename files to Cascadios
         run: |
           cd build
-          find . -type f -name "*Cascadia*" | while read f; do
-            mv "$f" "$(echo $f | sed 's/Cascadia/Cascadios/g')";
+          find . -type f -name "*CascadiaCode*" | while read f; do
+            mv "$f" "$(echo $f | sed 's/CascadiaCode/Cascadios/g')";
           done
           cd ..
 

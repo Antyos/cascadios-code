@@ -97,7 +97,7 @@ jobs:
             # Remove the trademark line before the next replacement
             sed -i 's/Cascadia Code is a .*/ /g' "${f}.ttx"
             # Replace family and full name in the XML
-            sed -i 's/Cascadia ?Code/Cascadios/g' "${f}.ttx"
+            sed -i 's/Cascadia *Code/Cascadios/g' "${f}.ttx"
             # Rebuild font from XML
             ttx -f -o "$f" "${f}.ttx"
             rm "${f}.ttx"

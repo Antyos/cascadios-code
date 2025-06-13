@@ -87,6 +87,33 @@ jobs:
       #   - Variable fonts only
       - name: Build fonts
         run: python ./build.py -W -M
+
+      - name: Rename fonts
+        run: |
+          cd build
+          for f in $(find . -type f \( -name "*.ttf" -o -name "*.otf" \)); do
+            # Dump font to XML
+            ttx -o "${f}.ttx" "$f"
+            # Replace family and full name in the XML
+            sed -i 's/Cascadia Code/Cascadios Code/g' "${f}.ttx"
+            sed -i 's/CascadiaCode/CascadiosCode/g' "${f}.ttx"
+            # Remove the trademark line
+            sed -i 's/Cascadia Code is a .*/ /g' "${f}.ttx"
+            # Rebuild font from XML
+            ttx -f -o "$f" "${f}.ttx"
+            rm "${f}.ttx"
+          done
+          cd ..
+      
+      # Regenerate the WOFF2 files
+      - name: Regenerate WOFF2 files from patched TTF/OTF
+        run: |
+          cd build/woff2
+          rm *.woff2
+          for f in ../ttf/*.ttf; do
+            pyftsubset "$f" --flavor=woff2 --output-file="${f%.*}.woff2" --with-zopfli --layout-features='*' --glyphs='*'
+          done
+          cd ../..
           
       - name: Upload font artifact
         uses: actions/upload-artifact@v4

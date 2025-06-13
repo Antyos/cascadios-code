@@ -103,10 +103,16 @@ jobs:
             ttx -f -o "$f" "${f}.ttx"
             rm "${f}.ttx"
           done
-          rename "s/Cascadia/Cascadios/g" ttf/*.ttf
           cd ..
 
-      # Regenerate the WOFF2 files
+      - name: Rename files to Cascadios
+        run: |
+          cd build
+          find . -type f -name "*Cascadia*" | while read f; do
+            mv "$f" "$(echo $f | sed 's/Cascadia/Cascadios/g')";
+          done
+          cd ..
+
       - name: Regenerate WOFF2 files from patched TTF/OTF
         run: |
           cd build

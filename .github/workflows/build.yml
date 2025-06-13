@@ -94,27 +94,30 @@ jobs:
           for f in $(find . -type f \( -name "*.ttf" -o -name "*.otf" \)); do
             # Dump font to XML
             ttx -o "${f}.ttx" "$f"
+            # Remove the trademark line before the next replacement
+            sed -i 's/Cascadia Code is a .*/ /g' "${f}.ttx"
             # Replace family and full name in the XML
             sed -i 's/Cascadia Code/Cascadios Code/g' "${f}.ttx"
             sed -i 's/CascadiaCode/CascadiosCode/g' "${f}.ttx"
-            # Remove the trademark line
-            sed -i 's/Cascadia Code is a .*/ /g' "${f}.ttx"
             # Rebuild font from XML
             ttx -f -o "$f" "${f}.ttx"
             rm "${f}.ttx"
           done
+          rename "s/Cascadia/Cascadios/g" ttf/*.ttf
           cd ..
-      
+
       # Regenerate the WOFF2 files
       - name: Regenerate WOFF2 files from patched TTF/OTF
         run: |
-          cd build/woff2
-          rm *.woff2
-          for f in ../ttf/*.ttf; do
+          cd build
+          rm -r woff2
+          for f in ttf/*.ttf; do
             pyftsubset "$f" --flavor=woff2 --output-file="${f%.*}.woff2" --with-zopfli --layout-features='*' --glyphs='*'
           done
+          mkdir woff2
+          mv ttf/*.woff2 woff2/
           cd ../..
-          
+
       - name: Upload font artifact
         uses: actions/upload-artifact@v4
         with:
